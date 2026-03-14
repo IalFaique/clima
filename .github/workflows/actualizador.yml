@@ -1,0 +1,32 @@
+name: Actualizador del Clima El Faique
+
+on:
+  schedule:
+    - cron: '0 * * * *' # Se ejecuta cada hora en punto (ej: 7:00, 8:00...)
+  workflow_dispatch: # Nos permite tener un botón para ejecutarlo manualmente si queremos
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar el repositorio
+        uses: actions/checkout@v3
+
+      - name: Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Instalar librerías
+        run: pip install requests pandas
+
+      - name: Ejecutar el script recolector
+        run: python recolector.py
+
+      - name: Guardar los nuevos datos en el archivo CSV
+        run: |
+          git config --global user.name "Monitor El Faique"
+          git config --global user.email "robot@elfaique.gob.pe"
+          git add historial_clima.csv
+          git commit -m "Registro automático del clima" || exit 0
+          git push
