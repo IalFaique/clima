@@ -42,7 +42,7 @@ js_temps = json.dumps(temps)
 js_hums = json.dumps(hums)
 js_condicion = json.dumps(condicion_cruda.capitalize()) 
 
-# 3. Diseño HTML/JS con "Desplegable Educativo"
+# 3. Diseño HTML/JS con "Traducción Ciudadana" y "Protocolos Ampliados"
 html_code = """
 <!DOCTYPE html>
 <html lang="es">
@@ -76,7 +76,6 @@ body { font-family: 'Sora', sans-serif; background: var(--bg-main); color: var(-
 .status-bar { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 0; font-size: 0.82rem; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; border-bottom: 1px solid var(--border); margin-bottom: 1.5rem; }
 .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--status-green); flex-shrink: 0; }
 .status-text { color: var(--text-main); }
-
 .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin-bottom: 1.5rem; }
 .metric-item { text-align: center; padding: 1.5rem 1rem; position: relative; }
 .metric-item:not(:last-child)::after { content: ''; position: absolute; top: 20%; right: 0; height: 60%; width: 1px; background: var(--border); }
@@ -89,12 +88,11 @@ body { font-family: 'Sora', sans-serif; background: var(--bg-main); color: var(-
 .metric-value.hum { color: var(--status-green); }
 .metric-advice { font-size: 0.75rem; font-weight: 600; color: var(--inst-blue); margin-top: 0.6rem; background: var(--bg-sub); padding: 0.4rem; border-radius: 6px; display: inline-block; border: 1px solid var(--border);}
 
-.alert-banner { border-radius: 8px; padding: 1.2rem 1.5rem; margin-bottom: 1rem; font-size: 0.85rem; line-height: 1.65; color: var(--text-main); }
+.alert-banner { border-radius: 8px; padding: 1.2rem 1.5rem; margin-bottom: 1.5rem; font-size: 0.85rem; line-height: 1.65; color: var(--text-main); }
 .alert-banner.lluvia { background: var(--alert-rain-bg); border-left: 5px solid var(--status-amber); color: var(--alert-rain-text); }
 .alert-banner.normal { background: var(--alert-norm-bg); border-left: 5px solid var(--status-sky); color: var(--alert-norm-text); }
 .alert-title { font-weight: 700; font-size: 1rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
 
-/* NUEVO: ESTILOS PARA LA GUÍA EDUCATIVA */
 .edu-section { margin-bottom: 1.5rem; }
 .edu-details { background: var(--bg-sub); border: 1px solid var(--border); border-radius: 8px; padding: 0.8rem 1.2rem; transition: all 0.3s; }
 .edu-summary { font-size: 0.85rem; font-weight: 700; color: var(--inst-blue); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; outline: none; }
@@ -112,7 +110,6 @@ body { font-family: 'Sora', sans-serif; background: var(--bg-main); color: var(-
 .chart-tab { font-size: 0.68rem; font-weight: 600; text-transform: uppercase; padding: 0.4rem 0.8rem; border-radius: 20px; border: 1px solid var(--border); cursor: pointer; transition: all 0.2s; font-family: 'IBM Plex Mono', monospace; background: var(--bg-main); color: var(--text-muted); }
 .chart-tab.active { background: var(--inst-blue); color: #ffffff; border-color: var(--inst-blue); }
 .chart-wrap { position: relative; height: 260px; }
-
 .directory-section { margin-bottom: 1.5rem; }
 .directory-grid { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem; }
 .dir-item { text-align: left; padding: 1.1rem; flex: 1 1 220px; background: var(--bg-sub); border-radius: 8px; cursor: pointer; text-decoration: none; display: flex; align-items: center; gap: 15px; border: 1px solid var(--border); }
@@ -275,10 +272,14 @@ function updateCards() {
     banner.className = 'alert-banner lluvia';
     document.getElementById('alert-title').className = 'alert-title lluvia';
     document.getElementById('alert-title').innerHTML = '⚠️ Directivas de Defensa Civil';
+    
+    // AQUÍ SE AGREGARON LAS DOS NUEVAS DIRECTIVAS
     document.getElementById('alert-body').innerHTML = `
       <ul style="margin-top: 8px; margin-bottom: 0; padding-left: 20px; line-height: 1.6;">
         <li>Evite cruzar quebradas o badenes con caudal incrementado.</li>
         <li style="margin-top: 4px;">Asegure techos de calamina y aléjese de laderas inestables.</li>
+        <li style="margin-top: 4px;">Tenga preparada su <strong>mochila de emergencia</strong> con provisiones básicas y linterna.</li>
+        <li style="margin-top: 4px;">Identifique las <strong>rutas de evacuación y zonas seguras</strong> establecidas por la municipalidad.</li>
       </ul>
     `;
   } else {
@@ -358,5 +359,5 @@ html_final = html_final.replace("/*PY_HUMS*/", js_hums)
 html_final = html_final.replace("/*PY_IS_RAIN*/", is_rain)
 html_final = html_final.replace("/*PY_CONDICION*/", js_condicion)
 
-# He subido ligeramente la altura a 1150px para dar espacio al nuevo texto desplegable.
-components.html(html_final, height=1150, scrolling=True)
+# Aumentamos ligeramente la altura base para dar espacio a los nuevos puntos del listado
+components.html(html_final, height=1100, scrolling=True)
