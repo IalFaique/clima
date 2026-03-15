@@ -115,7 +115,7 @@ if os.path.exists("historial_clima.csv"):
         <div class="ux-card card-temp">
             <span class="ux-icon">🌡️</span>
             <span class="ux-label">Temperatura</span>
-            <div class="ux-value">{ultimo_dato['Temperatura (°C)']}</div>
+            <div class="ux-value">{ultimo_dato['Temperatura (°C)']}°C</div>
         </div>
         <div class="ux-card card-hum">
             <span class="ux-icon">💧</span>
