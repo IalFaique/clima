@@ -6,7 +6,7 @@ import plotly.graph_objs as go
 # 1. CONFIGURACIÓN
 st.set_page_config(page_title="Clima El Faique", layout="centered", page_icon="🏛️")
 
-# 2. CSS: EQUILIBRIO INSTITUCIONAL Y MODERNO
+# 2. CSS: RESPONSIVO, INSTITUCIONAL Y MODERNO
 st.markdown("""
 <style>
     /* Fondo oscuro pero no negro total */
@@ -27,7 +27,7 @@ st.markdown("""
     .institucional-title { margin: 0; font-size: 2.2rem; font-weight: 800; color: white; letter-spacing: 0.5px; }
     .institucional-subtitle { margin: 5px 0 0 0; font-size: 1rem; font-weight: 500; color: #E0F2FE; text-transform: uppercase; letter-spacing: 1.5px;}
     
-    /* Tarjetas con toques de color */
+    /* Tarjetas base */
     .card-container { display: flex; gap: 1.5rem; margin-bottom: 1.5rem; }
     .ux-card {
         flex: 1;
@@ -63,13 +63,30 @@ st.markdown("""
         font-size: 0.95rem;
     }
     .update-text { text-align: right; color: #8B949E; font-size: 0.85rem; margin-bottom: 1rem; font-style: italic; }
+
+    /* --- REGLAS RESPONSIVAS PARA CELULARES --- */
+    @media (max-width: 768px) {
+        .card-container {
+            flex-direction: column; /* Apila las tarjetas hacia abajo */
+            gap: 1rem;
+        }
+        .institucional-title {
+            font-size: 1.6rem; /* Reduce un poco el título principal */
+        }
+        .institucional-header {
+            padding: 1.5rem 1rem; /* Reduce el relleno del cuadro azul */
+        }
+        .ux-value {
+            font-size: 1.8rem; /* Ajusta el tamaño de los números */
+        }
+    }
 </style>
 """, unsafe_allow_html=True)
 
 # 3. ENCABEZADO CON ESCUDO
 st.markdown("""
 <div class="institucional-header">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/d/d6/Escudo_san_miguel_de_el_faique.png" alt="Escudo de San Miguel de El Faique" style="width: 90px; margin-bottom: 15px; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.5));">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/d/d6/Escudo_san_miguel_de_el_faique.png" alt="Escudo de San Miguel de El Faique" style="width: 80px; margin-bottom: 10px; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.5));">
     <h1 class="institucional-title">Municipalidad Distrital de San Miguel de El Faique</h1>
     <div class="institucional-subtitle">Portal Oficial de Alerta Temprana 🌧️</div>
 </div>
@@ -98,7 +115,7 @@ if os.path.exists("historial_clima.csv"):
         <div class="ux-card card-temp">
             <span class="ux-icon">🌡️</span>
             <span class="ux-label">Temperatura</span>
-            <div class="ux-value">{ultimo_dato['Temperatura (°C)']}°C</div>
+            <div class="ux-value">{ultimo_dato['Temperatura (°C)']}</div>
         </div>
         <div class="ux-card card-hum">
             <span class="ux-icon">💧</span>
@@ -160,11 +177,11 @@ if os.path.exists("historial_clima.csv"):
     
     colA, colB, colC = st.columns(3)
     with colA:
-        st.markdown("<div class='contacto-card'>🚑 <b>Centro de Salud</b><br><span style='color:#8B949E; font-size: 0.8rem;'>Atención 24h</span><br><span style='color:#00E5FF; font-weight: bold;'>[955969319]</span></div>", unsafe_allow_html=True)
+        st.markdown("<div class='contacto-card'>🚑 <b>Centro de Salud</b><br><span style='color:#8B949E; font-size: 0.8rem;'>Atención 24h</span><br><span style='color:#00E5FF; font-weight: bold;'>[Tu Número]</span></div>", unsafe_allow_html=True)
     with colB:
-        st.markdown("<div class='contacto-card'>🚓 <b>Comisaría PNP</b><br><span style='color:#8B949E; font-size: 0.8rem;'>Apoyo y Rescate</span><br><span style='color:#00E5FF; font-weight: bold;'>[968732294]</span></div>", unsafe_allow_html=True)
+        st.markdown("<div class='contacto-card'>🚓 <b>Comisaría PNP</b><br><span style='color:#8B949E; font-size: 0.8rem;'>Apoyo y Rescate</span><br><span style='color:#00E5FF; font-weight: bold;'>[Tu Número]</span></div>", unsafe_allow_html=True)
     with colC:
-        st.markdown("<div class='contacto-card'>🛡️ <b>Defensa Civil</b><br><span style='color:#8B949E; font-size: 0.8rem;'>Municipalidad</span><br><span style='color:#00E5FF; font-weight: bold;'>[928253019]</span></div>", unsafe_allow_html=True)
+        st.markdown("<div class='contacto-card'>🛡️ <b>Serenazgo / D. Civil</b><br><span style='color:#8B949E; font-size: 0.8rem;'>Municipalidad</span><br><span style='color:#00E5FF; font-weight: bold;'>[Tu Número]</span></div>", unsafe_allow_html=True)
 
 else:
     st.info("Sincronizando con la estación meteorológica...")
