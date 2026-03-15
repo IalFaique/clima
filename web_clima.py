@@ -12,14 +12,12 @@ st.markdown("""
     #MainMenu {visibility: hidden;} footer {visibility: hidden;} header {visibility: hidden;}
     .block-container { padding: 0rem !important; max-width: 100% !important; }
     iframe { border: none !important; }
-    
-    /* Adaptación automática del fondo exterior según el dispositivo */
     @media (prefers-color-scheme: light) { .stApp { background-color: #ffffff !important; } }
     @media (prefers-color-scheme: dark) { .stApp { background-color: #0a0e1a !important; } }
 </style>
 """, unsafe_allow_html=True)
 
-# 2. Lógica de lectura de datos (Del CSV a Python)
+# 2. Lógica de lectura de datos
 try:
     df = pd.read_csv("historial_clima.csv")
     ultimos_datos = df.tail(24)
@@ -29,19 +27,23 @@ try:
         labels = ultimos_datos['Fecha y Hora'].apply(lambda x: str(x).split(' ')[-1]).tolist()
     temps = ultimos_datos['Temperatura (°C)'].tolist()
     hums = ultimos_datos['Humedad (%)'].tolist()
-    condicion_actual = str(ultimos_datos['Condición'].iloc[-1]).lower() if 'Condición' in df.columns else str(ultimos_datos['Estado'].iloc[-1]).lower()
-    is_rain = "true" if "lluvia" in condicion_actual else "false"
+    
+    # Extraer exactamente la condición tal cual viene en el CSV
+    condicion_cruda = str(ultimos_datos['Condición'].iloc[-1]) if 'Condición' in df.columns else str(ultimos_datos['Estado'].iloc[-1])
+    is_rain = "true" if "lluvia" in condicion_cruda.lower() else "false"
 except Exception as e:
     labels = ["08:00", "09:00", "10:00", "11:00", "12:00"]
     temps = [20.1, 21.0, 22.5, 23.1, 22.8]
     hums = [60, 62, 65, 70, 85]
+    condicion_cruda = "Lluvia moderada"
     is_rain = "true"
 
 js_labels = json.dumps(labels)
 js_temps = json.dumps(temps)
 js_hums = json.dumps(hums)
+js_condicion = json.dumps(condicion_cruda.capitalize()) # Enviamos el texto exacto
 
-# 3. Diseño HTML/JS (Con Motor de Modo Oscuro/Claro Automático)
+# 3. Diseño HTML/JS
 html_code = """
 <!DOCTYPE html>
 <html lang="es">
@@ -52,7 +54,6 @@ html_code = """
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-/* ─── VARIABLES POR DEFECTO (MODO CLARO) ─── */
 :root {
   --bg-main: #ffffff;
   --bg-sub: #f8f9fa;
@@ -64,14 +65,11 @@ html_code = """
   --status-sky: #0ea5e9;
   --status-amber: #f59e0b;
   --status-green: #10b981;
-  
   --alert-rain-bg: #fffcf0;
   --alert-rain-text: #856404;
   --alert-norm-bg: #f0faff;
   --alert-norm-text: #0c5460;
 }
-
-/* ─── VARIABLES INTELIGENTES (SE ACTIVAN SI EL DISPOSITIVO ESTÁ EN MODO OSCURO) ─── */
 @media (prefers-color-scheme: dark) {
   :root {
     --bg-main: #0a0e1a;
@@ -81,54 +79,38 @@ html_code = """
     --border: rgba(255,255,255,0.1);
     --inst-blue: #60a5fa; 
     --accent-teal: #2dd4bf;
-    
     --alert-rain-bg: rgba(245, 158, 11, 0.1);
     --alert-rain-text: #fcd34d;
     --alert-norm-bg: rgba(14, 165, 233, 0.1);
     --alert-norm-text: #7dd3fc;
   }
 }
-
 * { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-  font-family: 'Sora', sans-serif;
-  background: var(--bg-main);
-  color: var(--text-main);
-  min-height: 100vh;
-  overflow-x: hidden;
-  transition: background 0.3s, color 0.3s; 
-}
-
+body { font-family: 'Sora', sans-serif; background: var(--bg-main); color: var(--text-main); min-height: 100vh; overflow-x: hidden; transition: background 0.3s, color 0.3s; }
 .container { max-width: 100%; margin: 0 auto; padding: 2rem 4vw 4rem; background: var(--bg-main); }
-
 .hero { display: flex; gap: 1.5rem; align-items: center; padding: 1rem 0; border-bottom: 2px solid var(--border); margin-bottom: 1rem; }
 .hero-escudo img { width: 72px; }
 .hero-overline { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.2rem; }
 .hero-title { font-size: clamp(1.3rem, 3vw, 1.8rem); font-weight: 800; color: var(--inst-blue); margin-bottom: 0.1rem; }
 .hero-subtitle { font-size: 0.8rem; color: var(--accent-teal); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600;}
-
 .status-bar { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 0; font-size: 0.82rem; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; border-bottom: 1px solid var(--border); margin-bottom: 1.5rem; }
 .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--status-green); flex-shrink: 0; }
 .status-text { color: var(--text-main); }
-
 .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin-bottom: 1.5rem; }
 .metric-item { text-align: center; padding: 1.5rem 1rem; position: relative; }
 .metric-item:not(:last-child)::after { content: ''; position: absolute; top: 20%; right: 0; height: 60%; width: 1px; background: var(--border); }
 .metric-label { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.8rem; }
 .metric-icon { font-size: 1.6rem; margin-bottom: 0.6rem; display: block; color: var(--accent-teal); }
-.metric-value { font-size: 2.2rem; font-weight: 700; line-height: 1; color: var(--text-main); }
+.metric-value { font-size: 2.2rem; font-weight: 700; line-height: 1.2; color: var(--text-main); }
 .metric-value.lluvia { color: var(--status-amber); }
 .metric-value.normal { color: var(--status-sky); }
 .metric-value.temp { color: var(--status-sky); }
 .metric-value.hum { color: var(--status-green); }
 .metric-sub { font-size: 0.7rem; color: var(--text-muted); margin-top: 0.5rem; font-family: 'IBM Plex Mono', monospace; }
-
 .alert-banner { border-radius: 8px; padding: 1.2rem 1.5rem; margin-bottom: 1.5rem; font-size: 0.85rem; line-height: 1.65; color: var(--text-main); }
 .alert-banner.lluvia { background: var(--alert-rain-bg); border-left: 5px solid var(--status-amber); color: var(--alert-rain-text); }
 .alert-banner.normal { background: var(--alert-norm-bg); border-left: 5px solid var(--status-sky); color: var(--alert-norm-text); }
 .alert-title { font-weight: 700; font-size: 1rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
-
 .chart-section { padding: 1rem 0; margin-bottom: 1rem; }
 .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
 .section-title { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--inst-blue); }
@@ -136,7 +118,6 @@ body {
 .chart-tab { font-size: 0.68rem; font-weight: 600; text-transform: uppercase; padding: 0.4rem 0.8rem; border-radius: 20px; border: 1px solid var(--border); cursor: pointer; transition: all 0.2s; font-family: 'IBM Plex Mono', monospace; background: var(--bg-main); color: var(--text-muted); }
 .chart-tab.active { background: var(--inst-blue); color: #ffffff; border-color: var(--inst-blue); }
 .chart-wrap { position: relative; height: 260px; }
-
 .directory-section { margin-bottom: 1.5rem; }
 .directory-grid { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem; }
 .dir-item { text-align: left; padding: 1.1rem; flex: 1 1 220px; background: var(--bg-sub); border-radius: 8px; cursor: pointer; text-decoration: none; display: flex; align-items: center; gap: 15px; border: 1px solid var(--border); }
@@ -145,14 +126,12 @@ body {
 .dir-name { font-size: 0.85rem; font-weight: 700; color: var(--inst-blue); margin-bottom: 0.1rem; }
 .dir-role { font-size: 0.7rem; color: var(--text-muted); margin-bottom: 0.3rem; }
 .dir-phone { font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; font-weight: 600; color: var(--accent-teal); }
-
 .footer { text-align: center; font-size: 0.7rem; color: var(--text-muted); padding-top: 1rem; border-top: 1px solid var(--border); font-family: 'IBM Plex Mono', monospace; }
-
 @media (max-width: 640px) {
   .metrics-grid { grid-template-columns: 1fr; }
   .hero { flex-direction: column; text-align: center; gap: 1rem;}
   .directory-grid { flex-direction: column; gap: 0.7rem; }
-  .metric-value { font-size: 1.8rem; }
+  .metric-value { font-size: 1.6rem; } /* Ajuste de tamaño para textos más largos */
   .hero-title { font-size: 1.35rem; }
   .metric-item::after { display: none; }
   .metric-item { border-bottom: 1px solid var(--border); }
@@ -263,16 +242,17 @@ const data = {
 const latestTemp = data.temps[data.temps.length - 1];
 const latestHum  = data.hums[data.hums.length - 1];
 const isRain     = /*PY_IS_RAIN*/;
+const condicionExacta = /*PY_CONDICION*/;
 
 function updateCards() {
   const now = new Date();
   document.getElementById('last-update').textContent = 'Hoy a las ' + data.labels[data.labels.length - 1];
   document.getElementById('temp-val').textContent = latestTemp + '°C';
   document.getElementById('hum-val').textContent  = latestHum + '%';
+  document.getElementById('estado-val').textContent = condicionExacta;
 
   if (isRain) {
     document.getElementById('estado-icon').textContent = '⚠️';
-    document.getElementById('estado-val').textContent  = 'Lluvia';
     document.getElementById('estado-val').className    = 'metric-value lluvia';
     document.getElementById('estado-sub').textContent  = 'Condición de alerta activa';
     
@@ -290,7 +270,6 @@ function updateCards() {
     `;
   } else {
     document.getElementById('estado-icon').textContent = '✅';
-    document.getElementById('estado-val').textContent  = 'Estable';
     document.getElementById('estado-val').className    = 'metric-value normal';
     document.getElementById('estado-sub').textContent  = 'Condiciones normales';
     
@@ -365,6 +344,7 @@ html_final = html_code.replace("/*PY_LABELS*/", js_labels)
 html_final = html_final.replace("/*PY_TEMPS*/", js_temps)
 html_final = html_final.replace("/*PY_HUMS*/", js_hums)
 html_final = html_final.replace("/*PY_IS_RAIN*/", is_rain)
+html_final = html_final.replace("/*PY_CONDICION*/", js_condicion)
 
 # Renderizado final a 1400px
 components.html(html_final, height=2400, scrolling=False)
