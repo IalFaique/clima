@@ -6,12 +6,26 @@ import streamlit.components.v1 as components
 # 1. Configuración de página ancha
 st.set_page_config(page_title="Alerta Temprana | El Faique", layout="wide", page_icon="🏛️")
 
-# --- MOTOR DE ADAPTACIÓN PARA EL FONDO BASE DE STREAMLIT ---
+# --- MOTOR DE PANTALLA COMPLETA Y ADAPTACIÓN DE MODO OSCURO ---
 st.markdown("""
 <style>
     #MainMenu {visibility: hidden;} footer {visibility: hidden;} header {visibility: hidden;}
-    .block-container { padding: 0rem !important; max-width: 100% !important; }
-    iframe { border: none !important; }
+    
+    /* Remover absolutamente todos los márgenes de la plataforma base */
+    .block-container { 
+        padding: 0rem !important; 
+        max-width: 100% !important; 
+        margin: 0 !important;
+    }
+    
+    /* El truco maestro: El lienzo de diseño se adaptará al 100% de la altura de la pantalla (100vh) */
+    iframe { 
+        border: none !important; 
+        height: 100vh !important; 
+        width: 100% !important;
+    }
+    
+    /* Adaptación automática del fondo según el dispositivo */
     @media (prefers-color-scheme: light) { .stApp { background-color: #ffffff !important; } }
     @media (prefers-color-scheme: dark) { .stApp { background-color: #0a0e1a !important; } }
 </style>
@@ -28,7 +42,6 @@ try:
     temps = ultimos_datos['Temperatura (°C)'].tolist()
     hums = ultimos_datos['Humedad (%)'].tolist()
     
-    # Extraer exactamente la condición tal cual viene en el CSV
     condicion_cruda = str(ultimos_datos['Condición'].iloc[-1]) if 'Condición' in df.columns else str(ultimos_datos['Estado'].iloc[-1])
     is_rain = "true" if "lluvia" in condicion_cruda.lower() else "false"
 except Exception as e:
@@ -41,7 +54,7 @@ except Exception as e:
 js_labels = json.dumps(labels)
 js_temps = json.dumps(temps)
 js_hums = json.dumps(hums)
-js_condicion = json.dumps(condicion_cruda.capitalize()) # Enviamos el texto exacto
+js_condicion = json.dumps(condicion_cruda.capitalize()) 
 
 # 3. Diseño HTML/JS
 html_code = """
@@ -131,7 +144,7 @@ body { font-family: 'Sora', sans-serif; background: var(--bg-main); color: var(-
   .metrics-grid { grid-template-columns: 1fr; }
   .hero { flex-direction: column; text-align: center; gap: 1rem;}
   .directory-grid { flex-direction: column; gap: 0.7rem; }
-  .metric-value { font-size: 1.6rem; } /* Ajuste de tamaño para textos más largos */
+  .metric-value { font-size: 1.6rem; }
   .hero-title { font-size: 1.35rem; }
   .metric-item::after { display: none; }
   .metric-item { border-bottom: 1px solid var(--border); }
@@ -346,5 +359,5 @@ html_final = html_final.replace("/*PY_HUMS*/", js_hums)
 html_final = html_final.replace("/*PY_IS_RAIN*/", is_rain)
 html_final = html_final.replace("/*PY_CONDICION*/", js_condicion)
 
-# Renderizado final a 1400px
-components.html(html_final, height=2200, scrolling=True)
+# Al asignar scrolling=True, el contenido se desplaza naturalmente dentro del marco exacto de la pantalla.
+components.html(html_final, height=1000, scrolling=True)
