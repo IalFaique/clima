@@ -181,7 +181,7 @@ if os.path.exists("historial_clima.csv"):
     with colB:
         st.markdown("<div class='contacto-card'>🚓 <b>Comisaría PNP</b><br><span style='color:#8B949E; font-size: 0.8rem;'>Apoyo y Rescate</span><br><span style='color:#00E5FF; font-weight: bold;'>[968732294]</span></div>", unsafe_allow_html=True)
     with colC:
-        st.markdown("<div class='contacto-card'>🛡️ <b>Serenazgo / D. Civil</b><br><span style='color:#8B949E; font-size: 0.8rem;'>Municipalidad</span><br><span style='color:#00E5FF; font-weight: bold;'>[928253019]</span></div>", unsafe_allow_html=True)
+        st.markdown("<div class='contacto-card'>🛡️ <b>Defensa Civil</b><br><span style='color:#8B949E; font-size: 0.8rem;'>Municipalidad</span><br><span style='color:#00E5FF; font-weight: bold;'>[928253019]</span></div>", unsafe_allow_html=True)
 
 else:
     st.info("Sincronizando con la estación meteorológica...")
