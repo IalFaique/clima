@@ -10,22 +10,8 @@ st.set_page_config(page_title="Alerta Temprana | El Faique", layout="wide", page
 st.markdown("""
 <style>
     #MainMenu {visibility: hidden;} footer {visibility: hidden;} header {visibility: hidden;}
-    
-    /* Remover absolutamente todos los márgenes de la plataforma base */
-    .block-container { 
-        padding: 0rem !important; 
-        max-width: 100% !important; 
-        margin: 0 !important;
-    }
-    
-    /* El truco maestro: El lienzo de diseño se adaptará al 100% de la altura de la pantalla (100vh) */
-    iframe { 
-        border: none !important; 
-        height: 100vh !important; 
-        width: 100% !important;
-    }
-    
-    /* Adaptación automática del fondo según el dispositivo */
+    .block-container { padding: 0rem !important; max-width: 100% !important; margin: 0 !important; }
+    iframe { border: none !important; height: 100vh !important; width: 100% !important; }
     @media (prefers-color-scheme: light) { .stApp { background-color: #ffffff !important; } }
     @media (prefers-color-scheme: dark) { .stApp { background-color: #0a0e1a !important; } }
 </style>
@@ -56,7 +42,7 @@ js_temps = json.dumps(temps)
 js_hums = json.dumps(hums)
 js_condicion = json.dumps(condicion_cruda.capitalize()) 
 
-# 3. Diseño HTML/JS
+# 3. Diseño HTML/JS con "Desplegable Educativo"
 html_code = """
 <!DOCTYPE html>
 <html lang="es">
@@ -68,34 +54,15 @@ html_code = """
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root {
-  --bg-main: #ffffff;
-  --bg-sub: #f8f9fa;
-  --text-main: #0a0e1a;
-  --text-muted: rgba(10,14,26,0.5);
-  --border: rgba(10,14,26,0.1);
-  --inst-blue: #1A2980; 
-  --accent-teal: #14b8a6; 
-  --status-sky: #0ea5e9;
-  --status-amber: #f59e0b;
-  --status-green: #10b981;
-  --alert-rain-bg: #fffcf0;
-  --alert-rain-text: #856404;
-  --alert-norm-bg: #f0faff;
-  --alert-norm-text: #0c5460;
+  --bg-main: #ffffff; --bg-sub: #f8f9fa; --text-main: #0a0e1a; --text-muted: rgba(10,14,26,0.6); --border: rgba(10,14,26,0.1);
+  --inst-blue: #1A2980; --accent-teal: #14b8a6; --status-sky: #0ea5e9; --status-amber: #f59e0b; --status-green: #10b981;
+  --alert-rain-bg: #fffcf0; --alert-rain-text: #856404; --alert-norm-bg: #f0faff; --alert-norm-text: #0c5460;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg-main: #0a0e1a;
-    --bg-sub: #111827;
-    --text-main: #f9fafb;
-    --text-muted: rgba(255,255,255,0.5);
-    --border: rgba(255,255,255,0.1);
-    --inst-blue: #60a5fa; 
-    --accent-teal: #2dd4bf;
-    --alert-rain-bg: rgba(245, 158, 11, 0.1);
-    --alert-rain-text: #fcd34d;
-    --alert-norm-bg: rgba(14, 165, 233, 0.1);
-    --alert-norm-text: #7dd3fc;
+    --bg-main: #0a0e1a; --bg-sub: #111827; --text-main: #f9fafb; --text-muted: rgba(255,255,255,0.6); --border: rgba(255,255,255,0.1);
+    --inst-blue: #60a5fa; --accent-teal: #2dd4bf;
+    --alert-rain-bg: rgba(245, 158, 11, 0.1); --alert-rain-text: #fcd34d; --alert-norm-bg: rgba(14, 165, 233, 0.1); --alert-norm-text: #7dd3fc;
   }
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -109,21 +76,35 @@ body { font-family: 'Sora', sans-serif; background: var(--bg-main); color: var(-
 .status-bar { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 0; font-size: 0.82rem; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; border-bottom: 1px solid var(--border); margin-bottom: 1.5rem; }
 .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--status-green); flex-shrink: 0; }
 .status-text { color: var(--text-main); }
+
 .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin-bottom: 1.5rem; }
 .metric-item { text-align: center; padding: 1.5rem 1rem; position: relative; }
 .metric-item:not(:last-child)::after { content: ''; position: absolute; top: 20%; right: 0; height: 60%; width: 1px; background: var(--border); }
-.metric-label { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.8rem; }
+.metric-label { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.8rem; }
 .metric-icon { font-size: 1.6rem; margin-bottom: 0.6rem; display: block; color: var(--accent-teal); }
 .metric-value { font-size: 2.2rem; font-weight: 700; line-height: 1.2; color: var(--text-main); }
 .metric-value.lluvia { color: var(--status-amber); }
 .metric-value.normal { color: var(--status-sky); }
 .metric-value.temp { color: var(--status-sky); }
 .metric-value.hum { color: var(--status-green); }
-.metric-sub { font-size: 0.7rem; color: var(--text-muted); margin-top: 0.5rem; font-family: 'IBM Plex Mono', monospace; }
-.alert-banner { border-radius: 8px; padding: 1.2rem 1.5rem; margin-bottom: 1.5rem; font-size: 0.85rem; line-height: 1.65; color: var(--text-main); }
+.metric-advice { font-size: 0.75rem; font-weight: 600; color: var(--inst-blue); margin-top: 0.6rem; background: var(--bg-sub); padding: 0.4rem; border-radius: 6px; display: inline-block; border: 1px solid var(--border);}
+
+.alert-banner { border-radius: 8px; padding: 1.2rem 1.5rem; margin-bottom: 1rem; font-size: 0.85rem; line-height: 1.65; color: var(--text-main); }
 .alert-banner.lluvia { background: var(--alert-rain-bg); border-left: 5px solid var(--status-amber); color: var(--alert-rain-text); }
 .alert-banner.normal { background: var(--alert-norm-bg); border-left: 5px solid var(--status-sky); color: var(--alert-norm-text); }
 .alert-title { font-weight: 700; font-size: 1rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+
+/* NUEVO: ESTILOS PARA LA GUÍA EDUCATIVA */
+.edu-section { margin-bottom: 1.5rem; }
+.edu-details { background: var(--bg-sub); border: 1px solid var(--border); border-radius: 8px; padding: 0.8rem 1.2rem; transition: all 0.3s; }
+.edu-summary { font-size: 0.85rem; font-weight: 700; color: var(--inst-blue); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; outline: none; }
+.edu-summary::-webkit-details-marker { display: none; }
+.edu-summary::after { content: '▼'; font-size: 0.7rem; color: var(--accent-teal); transition: transform 0.3s; }
+.edu-details[open] .edu-summary::after { transform: rotate(180deg); }
+.edu-content { margin-top: 1rem; font-size: 0.8rem; line-height: 1.6; color: var(--text-main); padding-top: 1rem; border-top: 1px dashed var(--border); }
+.edu-content strong { color: var(--inst-blue); }
+.edu-p { margin-bottom: 0.8rem; }
+
 .chart-section { padding: 1rem 0; margin-bottom: 1rem; }
 .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
 .section-title { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--inst-blue); }
@@ -131,6 +112,7 @@ body { font-family: 'Sora', sans-serif; background: var(--bg-main); color: var(-
 .chart-tab { font-size: 0.68rem; font-weight: 600; text-transform: uppercase; padding: 0.4rem 0.8rem; border-radius: 20px; border: 1px solid var(--border); cursor: pointer; transition: all 0.2s; font-family: 'IBM Plex Mono', monospace; background: var(--bg-main); color: var(--text-muted); }
 .chart-tab.active { background: var(--inst-blue); color: #ffffff; border-color: var(--inst-blue); }
 .chart-wrap { position: relative; height: 260px; }
+
 .directory-section { margin-bottom: 1.5rem; }
 .directory-grid { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem; }
 .dir-item { text-align: left; padding: 1.1rem; flex: 1 1 220px; background: var(--bg-sub); border-radius: 8px; cursor: pointer; text-decoration: none; display: flex; align-items: center; gap: 15px; border: 1px solid var(--border); }
@@ -140,6 +122,7 @@ body { font-family: 'Sora', sans-serif; background: var(--bg-main); color: var(-
 .dir-role { font-size: 0.7rem; color: var(--text-muted); margin-bottom: 0.3rem; }
 .dir-phone { font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; font-weight: 600; color: var(--accent-teal); }
 .footer { text-align: center; font-size: 0.7rem; color: var(--text-muted); padding-top: 1rem; border-top: 1px solid var(--border); font-family: 'IBM Plex Mono', monospace; }
+
 @media (max-width: 640px) {
   .metrics-grid { grid-template-columns: 1fr; }
   .hero { flex-direction: column; text-align: center; gap: 1rem;}
@@ -177,25 +160,35 @@ body { font-family: 'Sora', sans-serif; background: var(--bg-main); color: var(-
       <div class="metric-label">Estado actual</div>
       <span class="metric-icon" id="estado-icon">☁️</span>
       <div class="metric-value" id="estado-val">—</div>
-      <div class="metric-sub" id="estado-sub">Sincronizando...</div>
+      <div class="metric-advice" id="estado-advice">Calculando...</div>
     </div>
     <div class="metric-item">
       <div class="metric-label">Temperatura local</div>
       <span class="metric-icon">🌡️</span>
       <div class="metric-value temp" id="temp-val">—</div>
-      <div class="metric-sub" id="temp-sub">°C — Sierra de Piura</div>
+      <div class="metric-advice" id="temp-advice">Calculando...</div>
     </div>
     <div class="metric-item">
-      <div class="metric-label">Humedad rel.</div>
+      <div class="metric-label">Humedad relativa</div>
       <span class="metric-icon">💧</span>
       <div class="metric-value hum" id="hum-val">—</div>
-      <div class="metric-sub" id="hum-sub">% — Humedad relativa</div>
+      <div class="metric-advice" id="hum-advice">Calculando...</div>
     </div>
   </div>
   
   <div class="alert-banner" id="alert-banner">
     <div class="alert-title" id="alert-title">⏳ Sincronizando datos...</div>
     <div id="alert-body">Conectando con la estación meteorológica.</div>
+  </div>
+
+  <div class="edu-section">
+    <details class="edu-details">
+      <summary class="edu-summary">📘 ¿Qué significan estos datos? (Guía para el vecino)</summary>
+      <div class="edu-content">
+        <p class="edu-p"><strong>🌡️ Temperatura:</strong> Nos indica qué tan frío o caliente está el ambiente. En nuestra sierra, es normal que baje por las noches. Es vital monitorearla para abrigar a tiempo a nuestros niños y adultos mayores, previniendo así enfermedades respiratorias.</p>
+        <p class="edu-p"><strong>💧 Humedad Relativa:</strong> Es la cantidad de "vapor de agua" que hay flotando en el aire. Si el porcentaje es muy alto (cerca al 100%), significa que el aire está completamente lleno de agua, lo que nos avisa que es muy probable que empiece a llover pronto.</p>
+      </div>
+    </details>
   </div>
   
   <div class="chart-section">
@@ -247,11 +240,7 @@ body { font-family: 'Sora', sans-serif; background: var(--bg-main); color: var(-
 </div>
 
 <script>
-const data = {
-  labels: /*PY_LABELS*/,
-  temps: /*PY_TEMPS*/,
-  hums: /*PY_HUMS*/
-};
+const data = { labels: /*PY_LABELS*/, temps: /*PY_TEMPS*/, hums: /*PY_HUMS*/ };
 const latestTemp = data.temps[data.temps.length - 1];
 const latestHum  = data.hums[data.hums.length - 1];
 const isRain     = /*PY_IS_RAIN*/;
@@ -260,41 +249,51 @@ const condicionExacta = /*PY_CONDICION*/;
 function updateCards() {
   const now = new Date();
   document.getElementById('last-update').textContent = 'Hoy a las ' + data.labels[data.labels.length - 1];
+  
   document.getElementById('temp-val').textContent = latestTemp + '°C';
   document.getElementById('hum-val').textContent  = latestHum + '%';
   document.getElementById('estado-val').textContent = condicionExacta;
 
+  let tempAdvice = "";
+  if (latestTemp < 18) { tempAdvice = "🧥 Clima frío: Abrigarse bien"; } 
+  else if (latestTemp >= 18 && latestTemp <= 24) { tempAdvice = "🍃 Clima templado y agradable"; } 
+  else { tempAdvice = "🥵 Clima cálido: Manténgase hidratado"; }
+  document.getElementById('temp-advice').textContent = tempAdvice;
+
+  let humAdvice = "";
+  if (latestHum > 80) { humAdvice = "☔ Ambiente denso: Posibles lloviznas"; } 
+  else if (latestHum > 50 && latestHum <= 80) { humAdvice = "✅ Humedad normal en el ambiente"; } 
+  else { humAdvice = "🌵 Ambiente seco: Cuide su piel"; }
+  document.getElementById('hum-advice').textContent = humAdvice;
+
   if (isRain) {
     document.getElementById('estado-icon').textContent = '⚠️';
     document.getElementById('estado-val').className    = 'metric-value lluvia';
-    document.getElementById('estado-sub').textContent  = 'Condición de alerta activa';
+    document.getElementById('estado-advice').textContent = '🚨 Condición de precaución';
     
     const banner = document.getElementById('alert-banner');
     banner.className = 'alert-banner lluvia';
     document.getElementById('alert-title').className = 'alert-title lluvia';
     document.getElementById('alert-title').innerHTML = '⚠️ Directivas de Defensa Civil';
-    
     document.getElementById('alert-body').innerHTML = `
       <ul style="margin-top: 8px; margin-bottom: 0; padding-left: 20px; line-height: 1.6;">
         <li>Evite cruzar quebradas o badenes con caudal incrementado.</li>
-        <li style="margin-top: 4px;">Asegure techos de calamina y aléjese de laderas inestables o trochas con riesgo de deslizamientos.</li>
-        <li style="margin-top: 4px;">Comuníquese de inmediato con las autoridades locales.</li>
+        <li style="margin-top: 4px;">Asegure techos de calamina y aléjese de laderas inestables.</li>
       </ul>
     `;
   } else {
     document.getElementById('estado-icon').textContent = '✅';
     document.getElementById('estado-val').className    = 'metric-value normal';
-    document.getElementById('estado-sub').textContent  = 'Condiciones normales';
+    document.getElementById('estado-advice').textContent = '👍 Sin alertas vigentes';
     
     const banner = document.getElementById('alert-banner');
     banner.className = 'alert-banner normal';
     document.getElementById('alert-title').className = 'alert-title normal';
     document.getElementById('alert-title').innerHTML = '✅ Condiciones Estables';
-    
     document.getElementById('alert-body').innerHTML = `
       <ul style="margin-top: 8px; margin-bottom: 0; padding-left: 20px; line-height: 1.6;">
-        <li>Vías y trochas carrozables operando en condiciones normales.</li>
-        <li style="margin-top: 4px;">Manténgase hidratado y proteja a niños y adultos mayores ante cambios de temperatura en la sierra piurana.</li>
+        <li>Vías y trochas carrozables operando con normalidad.</li>
+        <li style="margin-top: 4px;">Atento siempre a los comunicados oficiales del municipio.</li>
       </ul>
     `;
   }
@@ -359,5 +358,5 @@ html_final = html_final.replace("/*PY_HUMS*/", js_hums)
 html_final = html_final.replace("/*PY_IS_RAIN*/", is_rain)
 html_final = html_final.replace("/*PY_CONDICION*/", js_condicion)
 
-# Al asignar scrolling=True, el contenido se desplaza naturalmente dentro del marco exacto de la pantalla.
-components.html(html_final, height=1000, scrolling=True)
+# He subido ligeramente la altura a 1150px para dar espacio al nuevo texto desplegable.
+components.html(html_final, height=1150, scrolling=True)
