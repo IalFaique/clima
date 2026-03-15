@@ -347,4 +347,4 @@ html_final = html_final.replace("/*PY_IS_RAIN*/", is_rain)
 html_final = html_final.replace("/*PY_CONDICION*/", js_condicion)
 
 # Renderizado final a 1400px
-components.html(html_final, height=1800, scrolling=False)
+components.html(html_final, height=2200, scrolling=True)
