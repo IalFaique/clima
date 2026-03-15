@@ -177,11 +177,11 @@ if os.path.exists("historial_clima.csv"):
     
     colA, colB, colC = st.columns(3)
     with colA:
-        st.markdown("<div class='contacto-card'>🚑 <b>Centro de Salud</b><br><span style='color:#8B949E; font-size: 0.8rem;'>Atención 24h</span><br><span style='color:#00E5FF; font-weight: bold;'>[Tu Número]</span></div>", unsafe_allow_html=True)
+        st.markdown("<div class='contacto-card'>🚑 <b>Centro de Salud</b><br><span style='color:#8B949E; font-size: 0.8rem;'>Atención 24h</span><br><span style='color:#00E5FF; font-weight: bold;'>[955969319]</span></div>", unsafe_allow_html=True)
     with colB:
-        st.markdown("<div class='contacto-card'>🚓 <b>Comisaría PNP</b><br><span style='color:#8B949E; font-size: 0.8rem;'>Apoyo y Rescate</span><br><span style='color:#00E5FF; font-weight: bold;'>[Tu Número]</span></div>", unsafe_allow_html=True)
+        st.markdown("<div class='contacto-card'>🚓 <b>Comisaría PNP</b><br><span style='color:#8B949E; font-size: 0.8rem;'>Apoyo y Rescate</span><br><span style='color:#00E5FF; font-weight: bold;'>[968732294]</span></div>", unsafe_allow_html=True)
     with colC:
-        st.markdown("<div class='contacto-card'>🛡️ <b>Serenazgo / D. Civil</b><br><span style='color:#8B949E; font-size: 0.8rem;'>Municipalidad</span><br><span style='color:#00E5FF; font-weight: bold;'>[Tu Número]</span></div>", unsafe_allow_html=True)
+        st.markdown("<div class='contacto-card'>🛡️ <b>Serenazgo / D. Civil</b><br><span style='color:#8B949E; font-size: 0.8rem;'>Municipalidad</span><br><span style='color:#00E5FF; font-weight: bold;'>[928253019]</span></div>", unsafe_allow_html=True)
 
 else:
     st.info("Sincronizando con la estación meteorológica...")
