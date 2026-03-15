@@ -2,7 +2,7 @@ name: Actualizador del Clima El Faique
 
 on:
   schedule:
-    - cron: '0 * * * *' # Se ejecuta cada hora en punto (ej: 7:00, 8:00...)
+    - cron: '15 * * * *' # Se ejecuta cada hora en punto (ej: 7:00, 8:00...)
   workflow_dispatch: # Nos permite tener un botón para ejecutarlo manualmente si queremos
 
 jobs:
