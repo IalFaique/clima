@@ -293,7 +293,7 @@ function updateCards() {
     document.getElementById('alert-title').innerHTML = '✅ Condiciones Estables';
     document.getElementById('alert-body').innerHTML = `
       <ul style="margin-top: 8px; margin-bottom: 0; padding-left: 20px; line-height: 1.6;">
-        <li>Vías y trochas carrozables operando con normalidad.</li>
+        <li>Clima Estable</li>
         <li style="margin-top: 4px;">Atento siempre a los comunicados oficiales del municipio.</li>
       </ul>
     `;
